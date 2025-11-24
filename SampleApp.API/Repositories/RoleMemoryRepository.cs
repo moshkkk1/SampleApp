@@ -43,9 +43,4 @@ public class RolesMemoryRepository : IRoleRepository
     {
         return (List<Role>)Roles;
     }
-
-    List<User> IRoleRepository.GetRoles()
-    {
-        throw new NotImplementedException();
-    }
 }

@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IUserRepository, UsersMemoryRepository>(); // Добавьте эту строку
+builder.Services.AddSingleton<IRoleRepository, RolesMemoryRepository>(); 
 
 var app = builder.Build();
 app.UseSwagger();

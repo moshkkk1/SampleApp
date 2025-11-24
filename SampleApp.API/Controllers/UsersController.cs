@@ -24,9 +24,11 @@ public class UsersController : ControllerBase
 
         if (!result.IsValid)
         {
-            throw new Exception($"{result.Errors.First().ErrorMessage}");
+            return BadRequest(result.Errors.First().ErrorMessage);
         }
-        return Ok(_repo.CreateUser(user));
+
+        var createdUser = _repo.CreateUser(user);
+        return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
     }
 
     [HttpGet]

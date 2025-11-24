@@ -17,7 +17,7 @@ public class RolesController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult CreateUser(Role role)
+    public ActionResult CreateRole(Role role)
     {
         var validator = new RoleValidator();
         var result = validator.Validate(role);
@@ -42,7 +42,7 @@ public class RolesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult GetUserById(int id)
+    public ActionResult GetRoleById(int id)
     {
         return Ok(_repo.FindRoleById(id));
     }

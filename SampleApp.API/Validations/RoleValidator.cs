@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using FluentValidation;
 using SampleApp.API.Entities;
 
@@ -11,7 +8,7 @@ public class RoleValidator : AbstractValidator<Role>
 {
     public RoleValidator()
     {
-        RuleFor(u => u.Name)
+        RuleFor(r => r.Name)
             .NotEmpty()
             .WithMessage("Название роли обязательно")
             .Length(2, 50)
@@ -19,7 +16,7 @@ public class RoleValidator : AbstractValidator<Role>
             .Must(StartsWithCapitalLetter)
             .WithMessage("Роль должна начинаться с заглавной буквы");
 
-        RuleFor(u => u.Id).GreaterThan(0).WithMessage("ID должен быть положительным числом");
+        RuleFor(r => r.Id).GreaterThan(0).WithMessage("ID должен быть положительным числом");
     }
 
     private bool StartsWithCapitalLetter(string name)
