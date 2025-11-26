@@ -1,7 +1,7 @@
-
 using SampleApp.API.Entities;
 
 namespace SampleApp.API.Interfaces;
+
 public interface IUserRepository
 {
     User CreateUser(User user);

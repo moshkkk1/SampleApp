@@ -9,16 +9,19 @@ using Microsoft.AspNetCore.Mvc;
 using SampleApp.API.Data;
 using SampleApp.API.Dto;
 using SampleApp.API.Entities;
+using SampleApp.API.Services;
 
 namespace SampleApp.API.Controllers
 {
     public class SeedController : ControllerBase
     {
         private readonly SampleAppContext _db;
+        private readonly TokenService _token;
 
-        public SeedController(SampleAppContext db)
+        public SeedController(SampleAppContext db, TokenService token)
         {
             _db = db;
+            _token = token;
         }
 
         [HttpGet("generate")]
@@ -53,6 +56,7 @@ namespace SampleApp.API.Controllers
                         Login = user.Login,
                         PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password)),
                         PasswordSalt = hmac.Key,
+                        Token = _token.CreateToken(user.Login),
                     };
                     userToDb.Add(u);
                 }

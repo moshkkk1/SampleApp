@@ -1,9 +1,12 @@
+using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SampleApp.API.Dto;
 using SampleApp.API.Entities;
 using SampleApp.API.Interfaces;
+using SampleApp.API.Services;
 using SampleApp.API.Validations;
 
 namespace SampleApp.API.Controllers;
@@ -13,11 +16,13 @@ namespace SampleApp.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _repo;
+    private readonly ITokenService _token;
     private HMACSHA256 hmac = new HMACSHA256();
 
-    public UsersController(IUserRepository repo)
+    public UsersController(IUserRepository repo, TokenService token)
     {
         _repo = repo;
+        _token = token;
     }
 
     [HttpPost]
@@ -29,7 +34,9 @@ public class UsersController : ControllerBase
             PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password)),
             PasswordSalt = hmac.Key,
             Name = "",
+            Token = _token.CreateToken(userDto.Login),
         };
+
         var validator = new UserValidator();
         var result = validator.Validate(user);
 
@@ -42,6 +49,7 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
     }
 
+    [Authorize]
     [HttpGet]
     public ActionResult GetUsers()
     {
