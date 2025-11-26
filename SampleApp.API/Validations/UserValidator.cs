@@ -7,21 +7,19 @@ public class UserValidator : AbstractValidator<User>
 {
     public UserValidator()
     {
-        RuleFor(u => u.Name)
+        RuleFor(u => u.Login)
             .NotEmpty()
-            .WithMessage("Имя обязательно")
+            .WithMessage("Логин обязателен")
             .Length(2, 50)
-            .WithMessage("Имя должно быть от 2 до 50 символов")
+            .WithMessage("Логин должен быть от 2 до 50 символов")
             .Must(StartsWithCapitalLetter)
-            .WithMessage("Имя должно начинаться с заглавной буквы");
-
-        RuleFor(u => u.Id).GreaterThan(0).WithMessage("ID должен быть положительным числом");
+            .WithMessage("Логин должен начинаться с заглавной буквы");
     }
 
-    private bool StartsWithCapitalLetter(string name)
+    private bool StartsWithCapitalLetter(string Login)
     {
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(Login))
             return false;
-        return char.IsUpper(name[0]);
+        return char.IsUpper(Login[0]);
     }
 }
