@@ -49,11 +49,18 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpGet]
     public ActionResult GetUsers()
     {
         return Ok(_repo.GetUsers());
+    }
+
+    [HttpPost("Login")]
+    public ActionResult Login(UserDto userDto)
+    {
+        var user = _repo.FindUserByLogin(userDto.Login);
+        return CheckPasswordHash(userDto, user);
     }
 
     [HttpPut]
@@ -72,5 +79,21 @@ public class UsersController : ControllerBase
     public ActionResult DeleteUser(int id)
     {
         return Ok(_repo.DeleteUser(id));
+    }
+
+    private ActionResult CheckPasswordHash(UserDto userDto, User user)
+    {
+        using var hmac = new HMACSHA256(user.PasswordSalt);
+        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password));
+
+        for (int i = 0; i < computedHash.Length; i++)
+        {
+            if (computedHash[i] != user.PasswordHash[i])
+            {
+                return Unauthorized($"Неправильный пароль");
+            }
+        }
+
+        return Ok(user);
     }
 }

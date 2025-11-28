@@ -51,6 +51,18 @@ namespace SampleApp.API.Repositories
             throw new NotImplementedException();
         }
 
+        public User FindUserByLogin(string login)
+        {
+            var result = _db.Users.Where(u => u.Login == login).FirstOrDefault();
+
+            if (result == null)
+            {
+                throw new Exception($"Нет пользователя с логином = {login}");
+            }
+
+            return result;
+        }
+
         public List<User> GetUsers()
         {
             return _db.Users.ToList();
