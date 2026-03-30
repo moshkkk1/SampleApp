@@ -9,7 +9,7 @@ public class User : Base
 {
     public string Name { get; set; } = string.Empty;
     public required string Login { get; set; } = string.Empty;
-    public byte[] PasswordHash { get; set; }
-    public byte[] PasswordSalt { get; set; }
-    public string Token { get; set; }
+    public required byte[] PasswordHash { get; set; }
+    public required byte[] PasswordSalt { get; set; }
+    public required string Token { get; set; }
 }
