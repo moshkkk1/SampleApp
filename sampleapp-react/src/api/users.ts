@@ -1,8 +1,35 @@
-import axios from 'axios';
+import { apiClient } from './client';
+import type { User } from '../types';
 
-const API_URL = 'http://localhost:5197/api';
+// Добавляем задержку для демонстрации лоадера (как в Angular примере)
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const getUsers = async () => {
-  const response = await axios.get(`${API_URL}/Users`);
+export const getUsers = async (): Promise<User[]> => {
+  await delay(1000); // Имитация задержки
+  const response = await apiClient.get<User[]>('/Users');
+  return response.data;
+};
+
+export const getUserById = async (id: number): Promise<User> => {
+  await delay(800);
+  const response = await apiClient.get<User>(`/Users/${id}`);
+  return response.data;
+};
+
+export const createUser = async (user: Partial<User>) => {
+  await delay(1200);
+  const response = await apiClient.post('/Users', user);
+  return response.data;
+};
+
+export const updateUser = async (id: number, user: Partial<User>) => {
+  await delay(1200);
+  const response = await apiClient.put(`/Users/${id}`, user);
+  return response.data;
+};
+
+export const deleteUser = async (id: number) => {
+  await delay(1000);
+  const response = await apiClient.delete(`/Users/${id}`);
   return response.data;
 };

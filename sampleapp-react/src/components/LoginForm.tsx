@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { TextField, Button, Box, InputAdornment, IconButton, Alert } from '@mui/material';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { Box, Button, Alert } from '@mui/material';
+import { LogIn } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { FormInput } from './FormInput';
 
 type FormData = {
   login: string;
@@ -11,11 +12,31 @@ type FormData = {
 
 export const LoginForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { login } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, touchedFields, isValid },
+  } = useForm<FormData>({
+    mode: 'onChange',
+    defaultValues: {
+      login: '',
+      password: '',
+    },
+  });
+
+  const validateLogin = (value: string) => {
+    if (!value) return 'Логин обязателен';
+    return true;
+  };
+
+  const validatePassword = (value: string) => {
+    if (!value) return 'Пароль обязателен';
+    if (value.length < 3) return 'Минимум 3 символа';
+    return true;
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -35,40 +56,48 @@ export const LoginForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
-        <TextField
-          label="Логин"
-          {...register('login', { required: 'Логин обязателен' })}
-          error={!!errors.login}
-          helperText={errors.login?.message}
-          disabled={loading}
-          fullWidth
+        <Controller
+          name="login"
+          control={control}
+          rules={{ validate: validateLogin }}
+          render={({ field }) => (
+            <FormInput
+              label="Логин"
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={errors.login?.message}
+              touched={touchedFields.login}
+              required
+              disabled={loading}
+            />
+          )}
         />
 
-        <TextField
-          label="Пароль"
-          type={showPassword ? 'text' : 'password'}
-          {...register('password', { required: 'Пароль обязателен' })}
-          error={!!errors.password}
-          helperText={errors.password?.message}
-          disabled={loading}
-          fullWidth
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
+        <Controller
+          name="password"
+          control={control}
+          rules={{ validate: validatePassword }}
+          render={({ field }) => (
+            <FormInput
+              label="Пароль"
+              type="password"
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={errors.password?.message}
+              touched={touchedFields.password}
+              required
+              disabled={loading}
+            />
+          )}
         />
 
-        <Button 
-          type="submit" 
-          variant="contained" 
+        <Button
+          type="submit"
+          variant="contained"
           startIcon={<LogIn size={20} />}
-          disabled={loading}
-          fullWidth
+          disabled={!isValid || loading}
         >
           {loading ? 'Вход...' : 'Войти'}
         </Button>

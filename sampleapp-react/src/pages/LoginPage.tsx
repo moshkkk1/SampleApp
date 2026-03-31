@@ -1,10 +1,20 @@
-import { Container, Paper, Typography, Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Container, Paper, Typography, Box, Alert, Button } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 import { Lock } from 'lucide-react';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const registered = location.state?.registered;
+
+  useEffect(() => {
+    // Очищаем state после показа сообщения
+    if (registered) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [registered]);
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
@@ -13,6 +23,12 @@ export const LoginPage = () => {
           <Lock size={48} color="#3f51b5" />
           <Typography variant="h4" sx={{ mt: 2 }}>Вход</Typography>
         </Box>
+
+        {registered && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Регистрация успешна! Теперь вы можете войти.
+          </Alert>
+        )}
 
         <LoginForm onSuccess={() => navigate('/')} />
 

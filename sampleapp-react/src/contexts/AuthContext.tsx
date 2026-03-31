@@ -1,55 +1,42 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import type { User } from '../types';
-import { login as loginApi, register as registerApi } from '../api/auth';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
-type AuthContextType = {
-  user: User | null;
-  loading: boolean;
+interface AuthContextType {
+  user: any;
   login: (login: string, password: string) => Promise<void>;
-  register: (data: { login: string; password: string; name?: string }) => Promise<void>;
+  register: (login: string, password: string) => Promise<void>;
   logout: () => void;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
 
-  useEffect(() => {
-    // Проверяем localStorage при загрузке
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState(null);
 
   const login = async (login: string, password: string) => {
-    const user = await loginApi(login, password);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
+    // Ваша логика логина
+    console.log('Login:', login, password);
   };
 
-  const register = async (data: { login: string; password: string; name?: string }) => {
-    await registerApi(data);
-    // После регистрации не логиним автоматически
+  const register = async (login: string, password: string) => {
+    // Ваша логика регистрации
+    console.log('Register:', login, password);
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
 };
